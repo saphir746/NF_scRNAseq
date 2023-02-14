@@ -1,0 +1,4 @@
+# NextFlow
+.nextflow.*
+.nextflow/
+*.swp
