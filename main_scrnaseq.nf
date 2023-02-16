@@ -14,12 +14,10 @@ MD_ANACONDA = "Anaconda3/2020.07"
   
 include { SCRUBLET } from './workflows/scrublet'
 include { LEAD_MARKERS } from './workflows/lead_cluster_markers'
-//include { CELL_SPLIT } from './workflows/cells_split'
+include { CELLS_SPLIT } from './workflows/cells_separate'
 //
 include { integration } from './modules/integration'
 include { make_scv_file } from './modules/make_scv_files'
-
-
 
 Channel
   .from( "'0.3'", "'0.9'" )
@@ -56,17 +54,13 @@ process process_1 {
         
         label 'save_output'
 
-	module MD_ANACONDA
-        conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
+	module params.MD_ANACONDA
+        conda params.CONDA_ENV 
         
-	cpus 1
-        time "2h"
+	cpus 4
+        time "6h"
         memory "100G"
         
-        publishDir params.outdir,
-        	mode: "copy",
-        	overwrite: true
-        	
         input:
                 path(Rds)
 
@@ -92,6 +86,11 @@ workflow {
   make_scv_file(integration.out)
   
   LEAD_MARKERS(
+      RESOL,
+      integration.out
+  )
+  
+  CELLS_SPLIT(
       RESOL,
       integration.out
   )

@@ -2,9 +2,9 @@ process integration {
  
   label 'save_output'
 
-  module "Anaconda3/2019.07"
-  conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
-  
+  module params.MD_ANACONDA
+  conda params.CONDA_ENV
+
   cpus 1
   time "4h"
   memory "100G"

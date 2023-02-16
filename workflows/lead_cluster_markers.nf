@@ -9,15 +9,13 @@ nextflow.enable.dsl=2
 //////////////////////////////////////////////////////
 
 
-R0=Paths.get(workflow.projectDir.toString(), "assets/Unpack_CellRanger.R").toString()
-
 process lead_cluster_markers {
   
   label 'save_output'
 
-  module "Anaconda3/2019.07"
-  conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
-  
+  module params.MD_ANACONDA
+  conda params.CONDA_ENV
+
   cpus 1
   time "6h"
   memory "100G"
