@@ -31,11 +31,10 @@ Channel
         
 process unpack_CellRanger {
         
+	label 'save_output'
+
         container "/camp/stp/babs/working/schneid/Singularity/sceasy/sceasy_nourd.sif"
         
-//	module MD_ANACONDA
-//        conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
-
         cpus 4
         time "1h"
         memory "10G"
@@ -55,7 +54,9 @@ process unpack_CellRanger {
 
 process process_1 {
         
-        module MD_ANACONDA
+        label 'save_output'
+
+	module MD_ANACONDA
         conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
         
 	cpus 1

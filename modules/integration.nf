@@ -1,5 +1,7 @@
 process integration {
-  
+ 
+  label 'save_output'
+
   module "Anaconda3/2019.07"
   conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
   

@@ -13,6 +13,8 @@ R0=Paths.get(workflow.projectDir.toString(), "assets/Unpack_CellRanger.R").toStr
 
 process lead_cluster_markers {
   
+  label 'save_output'
+
   module "Anaconda3/2019.07"
   conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
   
