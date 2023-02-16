@@ -15,6 +15,6 @@ process integration {
   
   script:
     """
-    Rscript /camp/stp/babs/working/schneid/projects/sahaie/giovanni.giangreco/Characterisation_of_CAF_in_HPV_cancer_scrnaseq/Integration_general.R $Rds
+    Rscript Integration_general.R $Rds
     """
 }

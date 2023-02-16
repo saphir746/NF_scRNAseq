@@ -10,14 +10,6 @@ nextflow.enable.dsl=2
   
 MD_ANACONDA = "Anaconda3/2020.07"
 
-PY_DIR = params.WD
-//OUT_DIR = Paths.get( params.WD , "Data_interim_files_2" ).toString()
-//OUT_SCV = Paths.get( params.WD , "scviewer_files" ).toString()
-
-PY_DES_SCRIPT = Paths.get(PY_DIR,"scrub_things.py").toString()
-R0=Paths.get(PY_DIR,"Unpack_CellRanger.R").toString()
-R3=Paths.get(PY_DIR,"Preprocess_G2Mregress.R").toString()
-
 ////////////////////////////////////////
   
 include { SCRUBLET } from './workflows/scrublet'
@@ -39,10 +31,10 @@ Channel
         
 process unpack_CellRanger {
         
-//        container "/camp/stp/babs/working/schneid/Singularity/sceasy/sceasy_nourd.sif"
+        container "/camp/stp/babs/working/schneid/Singularity/sceasy/sceasy_nourd.sif"
         
-	module "Anaconda3/2019.07"
-        conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
+//	module MD_ANACONDA
+//        conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
 
         cpus 4
         time "1h"
@@ -79,10 +71,10 @@ process process_1 {
 
         output:
                 path("*_Umapped_Filteredseurat_object.RDS"), emit: main
-		            path("*_Umapped_seurat_object.RDS"), emit: sub
+		path("*_Umapped_seurat_object.RDS"), emit: sub
         script:
                 """
-                Rscript ${R3} $Rds
+                Rscript Unpack_CellRanger.R $Rds
                 """
 }
 

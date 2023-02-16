@@ -15,6 +15,6 @@ process make_scv_file {
   
   script:
     """
-    Rscript /camp/stp/babs/working/schneid/projects/sahaie/giovanni.giangreco/Characterisation_of_CAF_in_HPV_cancer_scrnaseq/scviewer_makeFiles.R $Rds
+    Rscript scviewer_makeFiles.R $Rds
     """
 }

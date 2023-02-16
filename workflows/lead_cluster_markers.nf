@@ -9,6 +9,8 @@ nextflow.enable.dsl=2
 //////////////////////////////////////////////////////
 
 
+R0=Paths.get(workflow.projectDir.toString(), "assets/Unpack_CellRanger.R").toString()
+
 process lead_cluster_markers {
   
   module "Anaconda3/2019.07"
@@ -26,7 +28,7 @@ process lead_cluster_markers {
   
   script:
     """
-    Rscript /camp/stp/babs/working/schneid/projects/sahaie/giovanni.giangreco/Characterisation_of_CAF_in_HPV_cancer_scrnaseq/Find_lead_markers_clusters.R $Rds $res
+    Rscript Find_lead_markers_clusters.R $Rds $res
     """
 }
 

@@ -36,9 +36,9 @@ process seurat_anndata {
         output:
                 path("*_raw.h5ad")
         script:
-                """
-		          Rscript ${R1} $RDSobj
-	           	"""
+        """
+	Rscript seurat_to_AnnData.R $RDSobj
+	"""
 
 }
 
@@ -61,10 +61,9 @@ process scrublet {
                 tuple val(sample), path("${sample}*_scrubletted.h5ad")
 
         script:
-                script = Paths.get(PY_DES_SCRIPT).toString()
-                """
-                python ${script} $h5d
-                """
+        """
+        python scrub_things.py $h5d
+        """
 }
 
 process anndata_seurat {
@@ -81,9 +80,9 @@ process anndata_seurat {
         output:
                 path("*_scrubletted.RDS")
         script:
-                """
-                Rscript ${R2}
-                """
+        """
+        Rscript AnnData_to_seurat.R
+        """
 }
 
 
