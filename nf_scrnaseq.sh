@@ -9,7 +9,7 @@ PROJECT_dir=/camp/stp/babs/working/schneid/projects/sahaie/giovanni.giangreco/Ch
 OUT_DIR=${PROJECT_dir}Data_interim_files_2
 OUT_SCV=${PROJECT_dir}scviewer_files_G2M
 
-nextflow run main_scrnaseq.nf \ #-resume \
+nextflow run main_scrnaseq.nf -resume \
                         --WD ${PROJECT_dir} \
 			--outdir ${OUT_DIR} \
 			--outscv ${OUT_SCV} \

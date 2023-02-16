@@ -15,6 +15,6 @@ process make_scv_file {
   
   script:
     """
-    Rscript scviewer_makeFiles.R $Rds
+    scviewer_makeFiles.R $Rds
     """
 }

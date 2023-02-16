@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(sceasy)
 library(reticulate)
 library(tidyverse)

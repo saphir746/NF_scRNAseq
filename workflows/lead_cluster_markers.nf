@@ -28,7 +28,7 @@ process lead_cluster_markers {
   
   script:
     """
-    Rscript Find_lead_markers_clusters.R $Rds $res
+    Find_lead_markers_clusters.R $Rds $res
     """
 }
 

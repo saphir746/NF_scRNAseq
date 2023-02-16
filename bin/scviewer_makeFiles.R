@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(scviewer)
 library(Seurat)
 library(gtools)

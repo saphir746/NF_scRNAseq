@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import scanpy as sc
 import scrublet as scr
 import scipy

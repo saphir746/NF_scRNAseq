@@ -47,7 +47,7 @@ process unpack_CellRanger {
                 path("*.RDS")
         script:
         """
-        Rscript ${R0} $loc
+        Unpack_CellRanger.R $loc
         """
 }
 
@@ -55,10 +55,10 @@ process unpack_CellRanger {
 
 process process_1 {
         
-        module "Anaconda3/2019.07"
+        module MD_ANACONDA
         conda "/camp/stp/babs/working/schneid/conda/envs/R-4.2-Seurat"
         
-	      cpus 1
+	cpus 1
         time "2h"
         memory "100G"
         
@@ -74,7 +74,7 @@ process process_1 {
 		path("*_Umapped_seurat_object.RDS"), emit: sub
         script:
                 """
-                Rscript Unpack_CellRanger.R $Rds
+                Preprocess_G2Mregress.R $Rds
                 """
 }
 

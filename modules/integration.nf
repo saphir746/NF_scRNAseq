@@ -15,6 +15,6 @@ process integration {
   
   script:
     """
-    Rscript Integration_general.R $Rds
+    Integration_general.R $Rds
     """
 }

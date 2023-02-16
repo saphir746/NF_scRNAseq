@@ -37,7 +37,7 @@ process seurat_anndata {
                 path("*_raw.h5ad")
         script:
         """
-	Rscript seurat_to_AnnData.R $RDSobj
+	seurat_to_AnnData.R $RDSobj
 	"""
 
 }
@@ -62,7 +62,7 @@ process scrublet {
 
         script:
         """
-        python scrub_things.py $h5d
+        scrub_things.py $h5d
         """
 }
 
@@ -81,7 +81,7 @@ process anndata_seurat {
                 path("*_scrubletted.RDS")
         script:
         """
-        Rscript AnnData_to_seurat.R
+        AnnData_to_seurat.R
         """
 }
 
