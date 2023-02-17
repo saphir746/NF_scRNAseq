@@ -8,15 +8,6 @@ nextflow.enable.dsl=2
 //// Made on my own (schneid@crick.ac.uk)  ///////////
 //////////////////////////////////////////////////////
   
-MD_ANACONDA = "Anaconda3/2020.07"
-CONDA_ENV = '/camp/stp/babs/working/schneid/conda/envs/Scrublet_py'
-
-PY_DIR = workflow.projectDir.toString()
-OUT_DIR = Paths.get( workflow.projectDir.toString() , "Data_interim_files" ).toString()
-OUT_SCV = Paths.get( workflow.projectDir.toString() , "scviewer_files" ).toString()
-PY_DES_SCRIPT = Paths.get(PY_DIR,"scrub_things.py").toString()
-R1=Paths.get(PY_DIR,"seurat_to_AnnData.R").toString()
-R2=Paths.get(PY_DIR,"AnnData_to_seurat.R").toString()
 
 ///////////////////////////////////////////////////////////////////////////////
 //// ANNDATA + SCRUBLET ///////////////////////////////////////////////////////
@@ -49,8 +40,8 @@ process scrublet {
         cpus 4
         time "3h"
         memory "10G"
-        module MD_ANACONDA
-        conda CONDA_ENV
+        module params.MD_ANACONDA
+        conda params.CONDA_ENV_PY
 
         tag { sample }
 

@@ -13,6 +13,7 @@ MD_ANACONDA = "Anaconda3/2020.07"
 ////////////////////////////////////////
   
 include { SCRUBLET } from './workflows/scrublet'
+include { CELLCYCLE_REGRESS } from './workflows/cell_cycle_regress'
 include { LEAD_MARKERS } from './workflows/lead_cluster_markers'
 include { CELLS_SPLIT } from './workflows/cells_separate'
 //
@@ -81,8 +82,10 @@ workflow {
   
   SCRUBLET(unpack_CellRanger.out)
   
-  process_1(SCRUBLET.out)
-  integration(process_1.out.main) 
+ // process_1(SCRUBLET.out)
+  CELLCYCLE_REGRESS(SCRUBLET.out)
+//  integration(process_1.out.main) 
+  integration(CELLCYCLE_REGRESS.out)
   make_scv_file(integration.out)
   
   LEAD_MARKERS(
