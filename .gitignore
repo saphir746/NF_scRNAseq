@@ -2,3 +2,4 @@
 .nextflow.*
 .nextflow/
 *.swp
+work/
