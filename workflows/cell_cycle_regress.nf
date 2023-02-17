@@ -45,6 +45,8 @@ process G2MREGRESS {
 
         tag { sample }
 
+	label 'save_output'
+
         input:
                 tuple val(sample), path(rds)
 
@@ -61,6 +63,8 @@ process filter_combine {
 
         module params.MD_ANACONDA
         conda params.CONDA_ENV
+
+	label 'save_output'
 
         cpus 4
         time "1h"
