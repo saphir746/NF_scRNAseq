@@ -13,4 +13,5 @@ nextflow run main_scrnaseq.nf -resume \
                         --WD ${PROJECT_dir} \
 			--outdir ${OUT_DIR} \
 			--outscv ${OUT_SCV} \
+			-profile local \
                         -work-dir $WORK_DIR

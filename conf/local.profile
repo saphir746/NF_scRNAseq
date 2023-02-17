@@ -10,4 +10,10 @@ profiles {
 		
 		process.executor = "local"
 	}
+
+	cluster {
+
+		includeConfig "singularity.config"
+		process.executor = "slurm"
+	}
 }
