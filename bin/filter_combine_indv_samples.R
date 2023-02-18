@@ -8,13 +8,14 @@ library(plyr)
 
 
 
-Cells_file<-list.files(.,pattern="SC21137_Umapped_(.*).RDS")
+Cells_file<-list.files(pattern="SC21137_Umapped_(.*).RDS")
 
 cell.names<-lapply(Cells_file, function(cell) str_match(cell,"SC21137_Umapped_(.*).RDS")[,2])
 
 seurat_list<-lapply(Cells_file, function(cell) read_rds(cell))
 names(seurat_list)<-cell.names
 
+thrsh.mt<-20
 
 ################################
 ################################## Filtering - mt content

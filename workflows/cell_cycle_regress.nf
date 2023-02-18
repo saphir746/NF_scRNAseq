@@ -68,7 +68,7 @@ process filter_combine {
 
         cpus 4
         time "1h"
-        memory "20G"
+        memory "100G"
 
         input:
                 path(rdss)
