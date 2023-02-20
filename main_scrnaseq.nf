@@ -19,6 +19,7 @@ include { CELLS_SPLIT } from './workflows/cells_separate'
 //
 include { integration } from './modules/integration'
 include { make_scv_file } from './modules/make_scv_files'
+include { assign_identities } from './modules/assign_cellIDs'
 
 Channel
   .from( "'0.3'", "'0.9'" )
@@ -74,6 +75,31 @@ process process_1 {
                 """
 }
 
+process integration_indv {
+
+        label 'save_output'
+
+        module params.MD_ANACONDA
+        conda params.CONDA_ENV
+
+        cpus 4
+        time "6h"
+        memory "100G"
+
+        input:
+                path(Rds)
+
+        output:
+                path("SC21137_Integrated_Filtered.RDS")
+        
+	script:
+        """
+        Integration_from_indv.R $Rds
+        """
+
+
+}
+
 ////////////////////////////////////////
 
 workflow {
@@ -83,19 +109,20 @@ workflow {
   SCRUBLET(unpack_CellRanger.out)
   
  // process_1(SCRUBLET.out)
+
   CELLCYCLE_REGRESS(SCRUBLET.out)
-//  integration(process_1.out.main) 
-  integration(CELLCYCLE_REGRESS.out)
-  make_scv_file(integration.out)
+  integration_indv(CELLCYCLE_REGRESS.out) | assign_identities
+
+  make_scv_file(assign_identities.out)
   
   LEAD_MARKERS(
       RESOL,
-      integration.out
+      assign_identities.out
   )
   
   CELLS_SPLIT(
       RESOL,
-      integration.out
+      assign_identities.out
   )
 }
 
