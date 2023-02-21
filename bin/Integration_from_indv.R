@@ -46,14 +46,19 @@ do_the_things<-function(seur_obj){
   return(seur_obj)
 }
 
-# convertHumanGeneList <- function(x){
-#   require("biomaRt")
-#   human <- useEnsembl("ensembl", dataset = "hsapiens_gene_ensembl", version = 105)
-#   mouse <- useEnsembl("ensembl", dataset = "mmusculus_gene_ensembl", version = 105)
-#   genesV2 = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x , mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
-#   humanx <- unique(genesV2[, 2])
-#   return(humanx)
-# }
+convertHumanGeneList <- function(x){
+  require("biomaRt")
+  human <- useEnsembl("ensembl", dataset = "hsapiens_gene_ensembl", version = 105)
+  mouse <- useEnsembl("ensembl", dataset = "mmusculus_gene_ensembl", version = 105)
+  genesV2 = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x , mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
+  humanx <- unique(genesV2[, 2])
+  return(humanx)
+}
+
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+s.genes.mm10<-convertHumanGeneList(s.genes)
+g2m.genes.mm10<-convertHumanGeneList(g2m.genes)
 
 do_all_of_it<-function(Umap_seurat_list){
   normalised_seurat_list<-  map(Umap_seurat_list, function(seur_obj) { do_the_things(seur_obj)})
@@ -61,18 +66,34 @@ do_all_of_it<-function(Umap_seurat_list){
   #### Integration round 1 
   
   features <- SelectIntegrationFeatures(object.list = normalised_seurat_list)
-  Anchors <- FindIntegrationAnchors(object.list = normalised_seurat_list, anchor.features = features)
-  Everything.combined <- IntegrateData(Anchors)
+  ## remove cc genes from potential anchors 
+  features <- features[!(features %in% c(s.genes.mm10,g2m.genes.mm10))]
+  #
+  ### Integration_large_datasets =https://satijalab.org/seurat/articles/integration_large_datasets.html 
+  normalised_seurat_list <- lapply(X = normalised_seurat_list, FUN = function(x) {
+    x <- ScaleData(x, features = features, verbose = FALSE)
+    x <- RunPCA(x, features = features, verbose = FALSE)
+  })
+  Anchors <- FindIntegrationAnchors(object.list = normalised_seurat_list, reference=c(1,2,7),  reduction = "rpca",
+                                    dims = 1:50)
+  Everything.combined <- IntegrateData(Anchors, normalization.method = "LogNormalize",  dims = 1:50, verbose = TRUE)
   DefaultAssay(Everything.combined) <- "integrated"
   
   cell_type<-Everything.combined[[]]$orig.ident %>% gsub('_\\d','',.)
   Everything.combined@meta.data$Cell.type<-cell_type
   
   # Run the standard workflow for visualization and clustering
-  
-  Everything.combined <- ScaleData(Everything.combined, verbose = FALSE)
+  all.genes <- rownames(Everything.combined)
+  Everything.combined <- CellCycleScoring(Everything.combined, s.features = s.genes.mm10,
+                                          g2m.features = g2m.genes.mm10, set.ident = FALSE)
+  Everything.combined   <- ScaleData(Everything.combined,
+                                     vars.to.regress = c("S.Score", "G2M.Score"), 
+                                     features = all.genes)
+  #
+  #Everything.combined <- ScaleData(Everything.combined, verbose = FALSE)
   stuff<-VariableFeatures(object = Everything.combined)
   Everything.combined <- RunPCA(Everything.combined, features = stuff, verbose = FALSE)
+  #
   int_dim <- intrinsicDimension::maxLikGlobalDimEst(Everything.combined@reductions$pca@cell.embeddings, k = 30)
   D<-ceiling(int_dim$dim.est)
   Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
@@ -90,13 +111,7 @@ do_all_of_it<-function(Umap_seurat_list){
   
   ###### Cell -cycle sorting
   # ### done in previous scripts ###############
-  # s.genes <- cc.genes$s.genes
-  # g2m.genes <- cc.genes$g2m.genes
-  # s.genes.mm10<-convertHumanGeneList(s.genes)
-  # g2m.genes.mm10<-convertHumanGeneList(g2m.genes)
-  # 
-  # Everything.combined <- CellCycleScoring(Everything.combined, s.features = s.genes.mm10,
-  #                                         g2m.features = g2m.genes.mm10, set.ident = FALSE)
+  
   return(Everything.combined)
 }
 

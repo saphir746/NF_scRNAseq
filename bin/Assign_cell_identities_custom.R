@@ -105,6 +105,6 @@ Everything.combined.moc23<-AddMetaData(Everything.combined.moc23, metadata=meta.
 
 saveRDS(
   Everything.combined.moc23,
-  file = #"SC21137_Integrated_Filtered_augmented.RDS"
-  paste0(dir_all,"/SC21137_Integrated_Filtered_augmented.RDS")
+  file = "SC21137_Integrated_Filtered_augmented.RDS"
+#  paste0(dir_all,"/SC21137_Integrated_Filtered_augmented.RDS")
 )

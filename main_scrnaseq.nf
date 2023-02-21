@@ -19,7 +19,7 @@ include { CELLS_SPLIT } from './workflows/cells_separate'
 //
 include { integration } from './modules/integration'
 include { make_scv_file } from './modules/make_scv_files'
-include { assign_identities } from './modules/assign_cellIDs'
+include { assign_identities; transfer_identities } from './modules/assign_cellIDs'
 
 Channel
   .from( "'0.3'", "'0.9'" )
