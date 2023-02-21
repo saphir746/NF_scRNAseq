@@ -25,6 +25,10 @@ Channel
   .from( "'0.3'", "'0.9'" )
   .set{ RESOL }
 
+Channel
+  .from( "'0.1'", "'0.5'","'0.7'" )
+  .set{ RESOL_split }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //// PROCESSES ////////////////////////////////////////////////////////////////
@@ -83,7 +87,7 @@ process integration_indv {
         conda params.CONDA_ENV
 
         cpus 4
-        time "6h"
+        time "4h"
         memory "100G"
 
         input:
@@ -111,18 +115,18 @@ workflow {
  // process_1(SCRUBLET.out)
 
   CELLCYCLE_REGRESS(SCRUBLET.out)
-  integration_indv(CELLCYCLE_REGRESS.out) | assign_identities
+  integration_indv(CELLCYCLE_REGRESS.out) | transfer_identities
 
-  make_scv_file(assign_identities.out)
+  make_scv_file(transfer_identities.out)
   
   LEAD_MARKERS(
       RESOL,
-      assign_identities.out
+      transfer_identities.out
   )
   
   CELLS_SPLIT(
-      RESOL,
-      assign_identities.out
+      RESOL_split,
+      transfer_identities.out
   )
 }
 
