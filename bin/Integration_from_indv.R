@@ -104,7 +104,8 @@ do_all_of_it<-function(Umap_seurat_list){
  # Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
   Everything.combined <- RunUMAP(Everything.combined, reduction = "pca", dims = 1:D)
   Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D) 
-  Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), algorithm = 4)#0.5)
+  Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), 
+                                      method = "igraph", algorithm = 4)
   
   ##
   

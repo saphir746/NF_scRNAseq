@@ -7,6 +7,9 @@ library(ggpubr)
 library(Seurat)
 library(SeuratObject)
 library(intrinsicDimension)
+## for Leiden algo
+library(reticulate)                                                                                    
+use_condaenv("scvelo-0.2.4")
 
 thrsh.mt<-20
 
@@ -37,10 +40,11 @@ stuff<-VariableFeatures(object = Everything.combined)
 Everything.combined <- RunPCA(Everything.combined, features = stuff, verbose = FALSE)
 int_dim <- intrinsicDimension::maxLikGlobalDimEst(Everything.combined@reductions$pca@cell.embeddings, k = 30)
 D<-ceiling(int_dim$dim.est)
-Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
+#Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
 Everything.combined <- RunUMAP(Everything.combined, reduction = "pca", dims = 1:D)
 Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D)
-Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2))#0.5)
+Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), 
+                                    method = "igraph", algorithm = 4)
   
 
 final.name<-paste0('SC21137_Integrated_Filtered_',suffix,'.RDS')
