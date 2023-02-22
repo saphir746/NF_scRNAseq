@@ -17,7 +17,7 @@ thrsh.mt<-20
 # dir_all_sub=paste0(GEN.dir,
 #                    "projects/sahaie/giovanni.giangreco/",
 #                    "Characterisation_of_CAF_in_HPV_cancer_scrnaseq")
-# dir_all=paste0(dir_all_sub,"/Data_interim_files")
+# dir_all=paste0(dir_all_sub,"/Data_interim_files_2/")
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -27,8 +27,6 @@ fileRDS<-args[1]
 
 Umap_seurat_list<-read_rds(fileRDS)
 # paste0(dir_all,"/SC21137_Umapped_Filteredseurat_object.RDS"))
-# exclude "MOC2_3" due to poor QC everything
-#Umap_seurat_list.bis<-Umap_seurat_list[names(Umap_seurat_list)!="MOC2_3"]
 
 ######################################
 
@@ -50,7 +48,8 @@ convertHumanGeneList <- function(x){
   require("biomaRt")
   human <- useEnsembl("ensembl", dataset = "hsapiens_gene_ensembl", version = 105)
   mouse <- useEnsembl("ensembl", dataset = "mmusculus_gene_ensembl", version = 105)
-  genesV2 = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x , mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
+  genesV2 = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x ,
+                   mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
   humanx <- unique(genesV2[, 2])
   return(humanx)
 }
@@ -59,6 +58,12 @@ s.genes <- cc.genes$s.genes
 g2m.genes <- cc.genes$g2m.genes
 s.genes.mm10<-convertHumanGeneList(s.genes)
 g2m.genes.mm10<-convertHumanGeneList(g2m.genes)
+
+
+## for Leiden algo
+
+library(reticulate)                                                                                    
+use_condaenv("scvelo-0.2.4")
 
 do_all_of_it<-function(Umap_seurat_list){
   normalised_seurat_list<-  map(Umap_seurat_list, function(seur_obj) { do_the_things(seur_obj)})
@@ -96,10 +101,10 @@ do_all_of_it<-function(Umap_seurat_list){
   #
   int_dim <- intrinsicDimension::maxLikGlobalDimEst(Everything.combined@reductions$pca@cell.embeddings, k = 30)
   D<-ceiling(int_dim$dim.est)
-  Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
+ # Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
   Everything.combined <- RunUMAP(Everything.combined, reduction = "pca", dims = 1:D)
-  Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D)
-  Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2))#0.5)
+  Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D) 
+  Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), algorithm = 4)#0.5)
   
   ##
   
