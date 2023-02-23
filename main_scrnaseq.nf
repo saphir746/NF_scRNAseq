@@ -29,6 +29,9 @@ Channel
   .from( "'0.1'", "'0.5'","'0.7'" )
   .set{ RESOL_split }
 
+Channel 
+  .fromPath('./assets/cc_genes_mm10.rds')
+  .set{ CC_GENES }
 
 ///////////////////////////////////////////////////////////////////////////////
 //// PROCESSES ////////////////////////////////////////////////////////////////
@@ -91,7 +94,7 @@ process integration_indv {
         memory "100G"
 
         input:
-                path(Rds)
+                tuple path(Rds), path(ccgenes)
 
         output:
                 path("SC21137_Integrated_Filtered.RDS")
@@ -115,19 +118,19 @@ workflow {
  // process_1(SCRUBLET.out)
 
   CELLCYCLE_REGRESS(SCRUBLET.out)
-  integration_indv(CELLCYCLE_REGRESS.out) | transfer_identities
+  CELLCYCLE_REGRESS.out.combine(CC_GENES) | integration_indv | transfer_identities
 
   make_scv_file(transfer_identities.out)
   
-  LEAD_MARKERS(
-      RESOL,
-      transfer_identities.out
-  )
-  
-  CELLS_SPLIT(
-      RESOL_split,
-      transfer_identities.out
-  )
+//  LEAD_MARKERS(
+//      RESOL,
+//      transfer_identities.out
+//  )
+//  
+//  CELLS_SPLIT(
+//      RESOL_split,
+//      transfer_identities.out
+//  )
 }
 
 workflow.onComplete {

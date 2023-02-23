@@ -18,6 +18,7 @@ thrsh.mt<-20
 #                    "projects/sahaie/giovanni.giangreco/",
 #                    "Characterisation_of_CAF_in_HPV_cancer_scrnaseq")
 # dir_all=paste0(dir_all_sub,"/Data_interim_files_2/")
+# dir_NF=paste0(dir_all_sub,"/NF_scRNAseq/")
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -26,7 +27,10 @@ fileRDS<-args[1]
 ######################################
 
 Umap_seurat_list<-read_rds(fileRDS)
-# paste0(dir_all,"/SC21137_Umapped_Filteredseurat_object.RDS"))
+#Umap_seurat_list<- read_rds(paste0(dir_all,"/SC21137_Umapped_Filteredseurat_object.RDS"))
+
+cc.genes.mm10<-read_rds('cc_genes_mm10.rds')
+# cc.genes.mm10<-read_rds(paste0(dir_NF,"assets/cc_genes_mm10.rds"))
 
 ######################################
 
@@ -44,53 +48,43 @@ do_the_things<-function(seur_obj){
   return(seur_obj)
 }
 
-convertHumanGeneList <- function(x){
-  require("biomaRt")
-  human <- useEnsembl("ensembl", dataset = "hsapiens_gene_ensembl", version = 105)
-  mouse <- useEnsembl("ensembl", dataset = "mmusculus_gene_ensembl", version = 105)
-  genesV2 = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x ,
-                   mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
-  humanx <- unique(genesV2[, 2])
-  return(humanx)
-}
-
-s.genes <- cc.genes$s.genes
-g2m.genes <- cc.genes$g2m.genes
-s.genes.mm10<-convertHumanGeneList(s.genes)
-g2m.genes.mm10<-convertHumanGeneList(g2m.genes)
-
-
 ## for Leiden algo
 
-library(reticulate)                                                                                    
-use_condaenv("scvelo-0.2.4")
+library(reticulate)                                                                                  
+use_condaenv("/camp/stp/babs/working/ghanata/code/cache/.conda/envs/scvelo-0.2.4")
 
 do_all_of_it<-function(Umap_seurat_list){
+  
+  print('re-process indv samples')
   normalised_seurat_list<-  map(Umap_seurat_list, function(seur_obj) { do_the_things(seur_obj)})
   
   #### Integration round 1 
-  
+  print('Select integration features')
   features <- SelectIntegrationFeatures(object.list = normalised_seurat_list)
   ## remove cc genes from potential anchors 
-  features <- features[!(features %in% c(s.genes.mm10,g2m.genes.mm10))]
+  features <- features[!(features %in% c(cc.genes.mm10$s,cc.genes.mm10$g2m))]
   #
   ### Integration_large_datasets =https://satijalab.org/seurat/articles/integration_large_datasets.html 
   normalised_seurat_list <- lapply(X = normalised_seurat_list, FUN = function(x) {
     x <- ScaleData(x, features = features, verbose = FALSE)
     x <- RunPCA(x, features = features, verbose = FALSE)
   })
+  print('Select integration Anchors using RPCA')
   Anchors <- FindIntegrationAnchors(object.list = normalised_seurat_list, reference=c(1,2,7),  reduction = "rpca",
                                     dims = 1:50)
+  print('Integration begins')
   Everything.combined <- IntegrateData(Anchors, normalization.method = "LogNormalize",  dims = 1:50, verbose = TRUE)
   DefaultAssay(Everything.combined) <- "integrated"
   
   cell_type<-Everything.combined[[]]$orig.ident %>% gsub('_\\d','',.)
   Everything.combined@meta.data$Cell.type<-cell_type
+  print('Integration completed')
   
   # Run the standard workflow for visualization and clustering
   all.genes <- rownames(Everything.combined)
-  Everything.combined <- CellCycleScoring(Everything.combined, s.features = s.genes.mm10,
-                                          g2m.features = g2m.genes.mm10, set.ident = FALSE)
+  Everything.combined <- CellCycleScoring(Everything.combined, s.features = cc.genes.mm10$s,
+                                          g2m.features = cc.genes.mm10$g2m, set.ident = FALSE)
+  print('CC regression AGAIN on integrated object')
   Everything.combined   <- ScaleData(Everything.combined,
                                      vars.to.regress = c("S.Score", "G2M.Score"), 
                                      features = all.genes)
@@ -105,10 +99,10 @@ do_all_of_it<-function(Umap_seurat_list){
   Everything.combined <- RunUMAP(Everything.combined, reduction = "pca", dims = 1:D)
   Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D) 
   Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), 
-                                      method = "igraph", algorithm = 4)
+                                      method = "igraph", algorithm = 4, verbose=TRUE)
   
   ##
-  
+  print('Leiden alg cluster discovery completed')
   Everything.combined[["percent.ptprc"]] <- PercentageFeatureSet(Everything.combined, pattern = "Ptprc", assay = 'RNA')
   Everything.combined@meta.data$Ptprc_detect <-ifelse(Everything.combined@meta.data$percent.ptprc>0,1,0)
   Everything.combined@meta.data$Ptprc_tdT_pos<-ifelse((Everything.combined@meta.data$Ptprc_detect==1)&

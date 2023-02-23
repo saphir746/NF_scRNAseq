@@ -14,9 +14,9 @@ library(formattable)
 #                    "projects/sahaie/giovanni.giangreco/",
 #                    "Characterisation_of_CAF_in_HPV_cancer_scrnaseq")
 # 
-# dir_all=paste0(dir_all_sub,"/Data_interim_files")
+# dir_all=paste0(dir_all_sub,"/Data_interim_files_2/")
 # Everything.combined <-
-#   read_rds(paste0(dir_all,"/SC21137_Integrated_Filtered_withMOC2_3.RDS"))
+#   read_rds(paste0(dir_all,"/SC21137_Integrated_Filtered.RDS"))
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -35,7 +35,7 @@ if(nrow(Everything.combined[[]])>40000){
 
 ###
 Everything.combined <- SetIdent(Everything.combined,
-                                      value = Everything.combined@meta.data$integrated_snn_res.0.3)
+                                      value = Everything.combined@meta.data$integrated_snn_res.0.9)
 DefaultAssay(Everything.combined)<-'RNA'
 
 ##############
@@ -102,9 +102,9 @@ cluster_identity_sets <- list()
 
 meta<-Everything.combined[[]]
 meta<- meta %>%
-  mutate_at(c('Cell.type', 'orig.ident', 'Phase', 'Cell.ident', 'Cell.ident.new','Ptprc_tdT_pos'), as.factor)
+  mutate_at(c('Cell.type', 'orig.ident','Cell.ident', 'Cell.ident.new','Phase','Ptprc_tdT_pos'), as.factor)
 
-for (m in grep('integrated_|Cell.type|orig.ident|Phase|Cell.ident|Cell.ident.new|Ptprc_tdT_pos',colnames(meta))) {  #
+for (m in grep('integrated_|Cell.type|orig.ident|Cell.ident|Cell.ident.new|Phase|Ptprc_tdT_pos',colnames(meta))) {  #
   cluster_identity_sets[[colnames(meta)[m]]] <- list(
     var      = colnames(Everything.combined[[]])[m],
     name     = gsub('_',' ',colnames(meta)[m]),
