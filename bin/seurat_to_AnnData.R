@@ -2,8 +2,8 @@
 
 library(sceasy)
 library(reticulate)
-library(tidyverse)
-library(ggpubr)
+#library(tidyverse)
+#library(ggpubr)
 library(Seurat)
 
 
@@ -23,7 +23,7 @@ library(Seurat)
 
 args = commandArgs(trailingOnly=TRUE)
 
-seurat_list <-read_rds(args[1])
+seurat_list <-readRDS(args[1])
 
 lapply(names(seurat_list), function(x){
 seurat_obj<-seurat_list[[x]]

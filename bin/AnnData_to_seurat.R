@@ -3,7 +3,7 @@
 library(sceasy)
 library(reticulate)
 library(tidyverse)
-library(ggpubr)
+#library(ggpubr)
 library(Seurat)
 
 sc <- import("scanpy")

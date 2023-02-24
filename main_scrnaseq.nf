@@ -90,7 +90,7 @@ process integration_indv {
         conda params.CONDA_ENV
 
         cpus 4
-        time "4h"
+        time "6h"
         memory "100G"
 
         input:

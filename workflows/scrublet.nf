@@ -1,5 +1,3 @@
-#!/usr/bin/env nextflow
-
 import java.nio.file.Paths
 
 nextflow.enable.dsl=2
@@ -17,6 +15,8 @@ nextflow.enable.dsl=2
 process seurat_anndata {
         
         container "/camp/stp/babs/working/schneid/Singularity/sceasy/sceasy_nourd.sif"
+//        container "quay.io/biocontainers/r-sceasy:0.0.7--r42hdfd78af_1"
+
         cpus 4
         time "1h"
         memory "10G"
@@ -40,10 +40,14 @@ process scrublet {
         cpus 4
         time "3h"
         memory "10G"
-        module params.MD_ANACONDA
-        conda params.CONDA_ENV_PY
+ //       module params.MD_ANACONDA
+ //       conda params.CONDA_ENV_PY
+        
+        container "docker://saphir746/scrublet:v1"
 
         tag { sample }
+
+	label 'save_h5s'
 
         input:
                 tuple val(sample), path(h5d)
@@ -59,8 +63,9 @@ process scrublet {
 
 process anndata_seurat {
         
+//        container "quay.io/biocontainers/r-sceasy:0.0.7--r42hdfd78af_1"
         container "/camp/stp/babs/working/schneid/Singularity/sceasy/sceasy_nourd.sif"
-        
+              
 	cpus 1
         time "1h"
         memory "20G"

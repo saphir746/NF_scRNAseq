@@ -7,6 +7,7 @@ library(ggpubr)
 library(Seurat)
 library(SeuratObject)
 library(intrinsicDimension)
+library(future)
 
 thrsh.mt<-20
 
@@ -49,7 +50,6 @@ do_the_things<-function(seur_obj){
 }
 
 ## for Leiden algo
-
 library(reticulate)                                                                                  
 use_condaenv("/camp/stp/babs/working/ghanata/code/cache/.conda/envs/scvelo-0.2.4")
 
@@ -85,6 +85,7 @@ do_all_of_it<-function(Umap_seurat_list){
   Everything.combined <- CellCycleScoring(Everything.combined, s.features = cc.genes.mm10$s,
                                           g2m.features = cc.genes.mm10$g2m, set.ident = FALSE)
   print('CC regression AGAIN on integrated object')
+  plan("multiprocess", workers = 4)
   Everything.combined   <- ScaleData(Everything.combined,
                                      vars.to.regress = c("S.Score", "G2M.Score"), 
                                      features = all.genes)
@@ -97,7 +98,8 @@ do_all_of_it<-function(Umap_seurat_list){
   D<-ceiling(int_dim$dim.est)
  # Everything.combined <- FindNeighbors(Everything.combined, dims = 1:D)
   Everything.combined <- RunUMAP(Everything.combined, reduction = "pca", dims = 1:D)
-  Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D) 
+  Everything.combined <- FindNeighbors(Everything.combined, reduction = "pca", dims = 1:D)
+  plan("multiprocess", workers = 4)
   Everything.combined <- FindClusters(Everything.combined, resolution = seq(0.1,1.1,0.2), 
                                       method = "igraph", algorithm = 4, verbose=TRUE)
   

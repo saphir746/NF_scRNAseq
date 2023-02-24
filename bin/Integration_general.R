@@ -20,7 +20,7 @@ thrsh.mt<-20
 # dir_all_sub=paste0(GEN.dir,
 #                    "projects/sahaie/giovanni.giangreco/",
 #                    "Characterisation_of_CAF_in_HPV_cancer_scrnaseq")
-# dir_all=paste0(dir_all_sub,"/Data_interim_files")
+# dir_all=paste0(dir_all_sub,"/Data_interim_files_2/")
 
 args = commandArgs(trailingOnly=TRUE)
 
