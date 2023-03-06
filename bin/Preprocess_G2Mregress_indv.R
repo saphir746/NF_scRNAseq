@@ -40,8 +40,9 @@ seur_obj<-NormalizeData(seur_obj)
 seur_obj<-FindVariableFeatures(seur_obj, selection.method = "vst", nfeatures = 3000)
 
 ################################### Cell-cycle scoring and regression
- 
-plan("multiprocess", workers = 4) 
+options(future.globals.maxSize = 8000 * 1024^2)
+
+plan("multicore", workers = 4) 
 seur_obj <- CellCycleScoring(seur_obj, s.features = s.genes.mm10,
                                g2m.features = g2m.genes.mm10, set.ident = FALSE)
 all.genes <- rownames(seur_obj)

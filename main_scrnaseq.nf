@@ -122,10 +122,10 @@ workflow {
 
   make_scv_file(transfer_identities.out)
   
-//  LEAD_MARKERS(
-//      RESOL,
-//      transfer_identities.out
-//  )
+  LEAD_MARKERS(
+      RESOL,
+      transfer_identities.out
+  )
 //  
 //  CELLS_SPLIT(
 //      RESOL_split,

@@ -6,14 +6,14 @@ process assign_identities {
   conda params.CONDA_ENV
 
   input:
-        path(Rds)
+        	tuple path(Rds), path(annot)
 
         output:
                 path("*_augmented.RDS")
 
         script:
         """
-        Assign_cell_identities_custom.R $Rds    
+        Assign_cellID_custom.R $Rds $annot
         """
 }
 
