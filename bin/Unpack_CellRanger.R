@@ -10,9 +10,6 @@ library(SeuratObject)
 #library(sceasy)
 options(Seurat.object.assay.version = 'v5')
 
-###
-
-
 args = commandArgs(trailingOnly=TRUE)
 
 dir_all_sub<-args[1]
