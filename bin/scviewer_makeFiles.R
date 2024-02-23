@@ -5,20 +5,19 @@ library(Seurat)
 library(gtools)
 library(formattable)
 
-# GEN.dir<-"/camp/stp/babs/working/schneid/"
+ GEN.dir<-"/camp/stp/babs/working/schneid/"
 # # #"/home/schneid/Documents/CAMP/"
 # # #"/home/deborah/Documents/Crick/Projects/"
 # #
 # 
-# dir_all_sub=paste0(GEN.dir,
-#                    "projects/sahaie/giovanni.giangreco/",
-#                    "Characterisation_of_CAF_in_HPV_cancer_scrnaseq")
-# 
-# dir_all=paste0(dir_all_sub,"/Data_interim_files_2/")
-# Everything.combined <-
-#   read_rds(paste0(dir_all,"/SC21137_Integrated_Filtered.RDS"))
+dir_all_sub=paste0(GEN.dir,
+                   "/haydaya/leticia.monin/lm510/")
 
-args = commandArgs(trailingOnly=TRUE)
+dir_all=paste0(dir_all_sub,"/Data_interim")
+# Seur_list <-
+#   read_rds(paste0(dir_all,"/lm510_UmappedFiltered_seurat_object.RDS"))
+
+#args = commandArgs(trailingOnly=TRUE)
 
 fileRDS<-args[1]
 Everything.combined <-read_rds(fileRDS)

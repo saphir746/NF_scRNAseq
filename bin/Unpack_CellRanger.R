@@ -8,27 +8,24 @@ library(tidyverse)
 library(Seurat)
 library(SeuratObject)
 #library(sceasy)
+options(Seurat.object.assay.version = 'v5')
 
 
 args = commandArgs(trailingOnly=TRUE)
 
 dir_all_sub<-args[1]
+#"/nemo/stp/babs/working/schneid/projects/haydaya/leticia.monin/lm510/"
+dir_all<-paste0(dir_all_sub,'Data_interim/')
 
 ###################################################
 
 cellranger_quantifications <- paste0(dir_all_sub,'/output_cellRanger')
 
 sample_meta <-
-  read_csv(paste0(dir_all_sub,'/SC21137_samplesheet_ASF.csv'))
+  read_csv(paste0(dir_all_sub,'/sampleSheet_design.csv'))
 
-sample_meta<-sample_meta[,c("Sample Name","Sample Replicate Group")]
+sample_meta<-sample_meta[,c("Sample_name","group","sorting_batch","mouse_id")]
 colnames(sample_meta)<-gsub(' ','_',colnames(sample_meta))
-rep<-unlist(lapply(sample_meta$Sample_Replicate_Group, function(x) str_split(x,' ')[[1]][1]))
-genotype<-unlist(lapply(sample_meta$Sample_Replicate_Group, function(x) str_split(x,' ')[[1]][3]))
-rep<-gsub('Replicate','',rep)
-sample_meta$Replicate<-rep
-sample_meta$Genotype<-genotype
-sample_meta<-sample_meta[,c("Sample_Name","Replicate","Genotype")]
 
 
 ###################################################
@@ -66,14 +63,13 @@ seurat_list <-
   map(seurat_list, function(seur_obj) {
     m_dat <- seur_obj[[]] %>%
       as_tibble(rownames = "cell_id") %>%
-      left_join(sample_meta, by = c("orig.ident" = "Sample_Name")) %>%
+      left_join(sample_meta, by = c("orig.ident" = "Sample_name")) %>%
       dplyr::select(-orig.ident,-nCount_RNA,-nFeature_RNA) %>%
       column_to_rownames(var = "cell_id")
     seur_obj <- AddMetaData(seur_obj, metadata = m_dat)
     seur_obj[["percent.mt"]] <- PercentageFeatureSet(seur_obj, pattern = "^mt-")
     seur_obj[["percent_ribosomal"]] <- PercentageFeatureSet(seur_obj, pattern = "^Rp[sl]")
-    seur_obj[["percent.tdT"]] <- PercentageFeatureSet(seur_obj, pattern = "tdTomato")
-   # seur_obj[["Cell.orig"]] <- ifelse(seur_obj[["percent.tdT"]]>0,'Mouse_host','Cancer_inject')
+    seur_obj[["percent.eGFP"]] <- PercentageFeatureSet(seur_obj, pattern = "eGFP")
     seur_obj
   })
 
@@ -82,6 +78,6 @@ seurat_list <-
 
 saveRDS(
   seurat_list,
-  file = "SC21137_raw_seurat_object.RDS"
-    #paste0(dir_all,"/SC21137_raw_seurat_object.RDS")
+  file = #"SC21137_raw_seurat_object.RDS"
+    paste0(dir_all,"/lm510_raw_seurat_object.RDS")
 )

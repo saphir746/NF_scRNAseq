@@ -1,5 +1,0 @@
-[GFX1-]: glxtest: libpci missing
-[GFX1-]: glxtest: Unable to open a connection to the X server
-[GFX1-]: glxtest: libEGL missing
-[GFX1-]: No GPUs detected via PCI
-[GFX1-]: Unrecognized feature VIDEO_OVERLAY
